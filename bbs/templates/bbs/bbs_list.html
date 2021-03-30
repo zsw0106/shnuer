@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}我的网站{% endblock %}
+{% block nav_bbs_active %}active{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'bbs/bbs.css' %}">
+{% endblock %}
+
+{# 页面内容 #}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">{% block bbs_list_title %}帖子列表{% endblock %}</div>
+                    <div class="panel-body">
+                        {% for bbs in bbss %}
+                            <div class="bbs">
+                                <h3><a href="{% url 'bbs_detail' bbs.pk %}">{{ bbs.title }}</a></h3>
+                                <p class="bbs-info">
+                                    <span class="glyphicon glyphicon-tag"></span> <a href="{% url 'bbss_with_type' bbs.bbs_type.pk %}">{{ bbs.bbs_type }}</a>&nbsp;&nbsp;
+                                    <span class="glyphicon glyphicon-time"></span> {{ bbs.created_time|date:"Y-m-d" }}&nbsp;&nbsp;
+                                    阅读({{ bbs.get_read_num }})&nbsp;&nbsp;
+                                    评论({% get_comment_count bbs %})&nbsp;&nbsp;
+                                    点赞({% get_like_count bbs %})
+                                </p>
+                                <p>{{ bbs.content|striptags|truncatechars:120|safe}}</p>
+                            </div>
+                        {% empty %}
+                            <div class="bbs">
+                                <h3>暂无发帖，敬请期待</h3>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="paginator">
+                    <ul class="pagination">
+                        {# 上一页 #}
+                        <li>
+                            {% if page_of_bbss.has_previous %}
+                                <a href="?page={{ page_of_bbss.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            {% else %}
+                                <span aria-hidden="true">&laquo;</span>
+                            {% endif %}
+                        </li>
+                        {# 全部页码 #}
+                        {% for page_num in page_range %}
+                            {% if page_num == page_of_bbss.number %}
+                                <li class="active"><span>{{ page_num }}</span></li>
+                            {% else %}
+                                {% if page_num == '...' %}
+                                    <li><span>{{ page_num }}</span></li>
+                                {% else %}
+                                    <li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {# 下一页 #}
+                        <li>
+                            {% if page_of_bbss.has_next %}
+                                <a href="?page={{ page_of_bbss.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            {% else %}
+                                <span aria-hidden="true">&raquo;</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                    <p>
+                        共有{{ page_of_bbss.paginator.count }}篇帖子，
+                        当前第{{ page_of_bbss.number }}页，共{{ page_of_bbss.paginator.num_pages }}页
+                    </p>
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-4 col-md-3 col-lg-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">帖子分类</div>
+                    <div class="panel-body">
+                        <ul class="bbs-types">
+                            {% for bbs_type in bbs_types %}
+                                <li>
+                                    <a href="{% url 'bbss_with_type' bbs_type.pk %}">
+                                        {{ bbs_type.type_name }} ({{ bbs_type.bbs_count }})
+                                    </a>
+                                </li>
+                            {% empty %}
+                                <li>暂无分类</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">日期归档</div>
+                    <div class="panel-body">
+                        <ul>
+                            {% for bbs_date, bbs_count in bbs_dates.items %}
+                                <li>
+                                    <a href="{% url 'bbss_with_date' bbs_date.year bbs_date.month %}">
+                                        {{ bbs_date|date:"Y年m月" }} ({{ bbs_count }})
+                                    </a>                                    
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

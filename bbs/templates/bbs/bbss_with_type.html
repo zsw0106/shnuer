@@ -1,0 +1,7 @@
+{% extends 'bbs/bbs_list.html' %}
+{% block title %}{{ bbs_type.type_name }}{% endblock %}
+
+{% block bbs_list_title %}
+    分类：{{ bbs_type.type_name }}
+    <a href="{% url 'bbs_list' %}">查看全部帖子</a>
+{% endblock %}
