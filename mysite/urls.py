@@ -22,11 +22,12 @@ from . import views
 urlpatterns = [
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
-    path('ckeditor', include('ckeditor_uploader.urls')),
+    path('ckeditor', include('ckeditor_uploader.urls_1')),
     path('bbs/', include('bbs.urls')),
     path('comment/', include('comment.urls')),
     path('likes/', include('likes.urls')),
     path('user/', include('user.urls')),
+    path('barter/', include('barter.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

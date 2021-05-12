@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}以物易物{% endblock %}
+{% block nav_barter_active %}active{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+{% block header_extends %}
+    <link rel="stylesheet" type="text/css" href="{% static 'barter/barter_list.css' %}">
+{% endblock %}
+
+<!-- 写入 base.html 中定义的 content -->
+{% block content %}
+<div class="htmleaf-container">
+        <div class="container">
+            <div class="" id="my-gallery-container">
+                {% for barter in barters %}
+                    {% if barter.image %}
+                    <div class="item"><a href="{% url 'barter_detail' barter.pk %}"><img src="{{ barter.image.url }}"  width=100% height=250px></a>
+                        <h2>换品：{{ barter.name }}</h2><br>
+                        <h2>想换物品：{{ barter.want_barter }}</h2><br>
+                        {{ barter.content|striptags|truncatechars:20|safe }}<br><br>
+                        <a href="{% url 'barter_detail' barter.pk %}"><button class="btn btn-primary"  style="text-align:center; width:100%;height:100%;margin:0px; ">换品详情</button></a>
+                        <br><br><br>
+                        
+                        <span class="glyphicon glyphicon-tag"></span> <a href="{% url 'barter_with_type' barter.barter_type.pk %}">{{ barter.barter_type }}</a><br><br>
+                        <span class="glyphicon glyphicon-time"></span> {{ barter.created_time|date:"Y-m-d" }}
+                        浏览量({{ barter.get_read_num }})&nbsp;
+                        评论({% get_comment_count barter %})&nbsp;
+                        点赞({% get_like_count barter %})
+                        
+                    </div>
+                    {% else %}
+                    <div class="item"><a href=""><img src="{% static 'img/dummy.png' %}"  width=100% height=250px></a>
+                        <h2>换品：{{ barter.name }}</h2><br>
+                        <h2>想换物品：{{ barter.want_barter }}</h2><br>
+                        {{ barter.content|striptags|truncatechars:20|safe }}<br><br>
+                        <button type="submit" class="btn btn-primary" style="text-align:center; width:100%;height:100%;margin:0px; ">换品详情</button>
+                        <br><br><br>
+                        <span class="glyphicon glyphicon-tag"></span> <a href="{% url 'barter_with_type' barter.barter_type.pk %}">{{ barter.barter_type }}</a><br><br>
+                        <span class="glyphicon glyphicon-time"></span> {{ barter.created_time|date:"Y-m-d" }}
+                        浏览量({{ barter.get_read_num }})&nbsp;
+                        评论({% get_comment_count barter %})&nbsp;
+                        点赞({% get_like_count barter %})
+                        
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block script_extends %}
+    <script type="text/javascript" src="{% static 'barter/mp.mansory.js' %}"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function ( $ ) {
+            $("#my-gallery-container").mpmansory(
+                {
+                    childrenClass: 'item', // default is a div
+                    columnClasses: 'padding', //add classes to items
+                    breakpoints:{
+                        lg: 4, 
+                        md: 4, 
+                        sm: 4,
+                        xs: 12
+                    },
+                    distributeBy: { order: false, height: false, attr: 'data-order', attrOrder: 'asc' }, //default distribute by order, options => order: true/false, height: true/false, attr => 'data-order', attrOrder=> 'asc'/'desc'
+                    onload: function (items) {
+                        //make somthing with items
+                    } 
+                }
+            );
+        });
+    </script>
+{% endblock %}
+    

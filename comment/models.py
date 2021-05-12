@@ -42,8 +42,8 @@ class Comment(models.Model):
     
     def send_mail(self):
         if self.parent is None:
-            # 评论我的博客
-            subject = '有人评论你的博客'
+            # 评论我的帖子
+            subject = '有人评论你的帖子'
             email = self.content_object.get_email()
         else:
             # 回复评论

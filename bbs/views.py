@@ -29,7 +29,7 @@ def get_bbs_list_common_data(request, bbss_all_list):
     if page_range[-1] != paginator.num_pages:
         page_range.append(paginator.num_pages)
 
-    # 获取日期归档对应的博客数量
+    # 获取日期归档对应的帖子数量
     bbs_dates = BBS.objects.dates('created_time', 'month', order="DESC")
     bbs_dates_dict = {}
     for bbs_date in bbs_dates:

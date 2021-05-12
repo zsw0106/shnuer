@@ -1,0 +1,7 @@
+{% extends 'barter/barter_list.html' %}
+{% block title %}{{ barter_type.type_name }}{% endblock %}
+
+{% block barter_list_title %}
+    分类：{{ barter_type.type_name }}
+    <a href="{% url 'barter_list' %}">查看全部换品</a>
+{% endblock %}
