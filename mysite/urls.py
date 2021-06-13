@@ -28,6 +28,9 @@ urlpatterns = [
     path('likes/', include('likes.urls')),
     path('user/', include('user.urls')),
     path('barter/', include('barter.urls')),
+    path('notifications/', include('notifications.urls', namespace='notifications')),
+    path('my_notifications/', include('my_notifications.urls')),
+    path('search/', views.search,name="search"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

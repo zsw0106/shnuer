@@ -27,17 +27,18 @@ class Barter(models.Model, ReadNumExpandMethod):
         (0, '奉贤'),
         (1, '徐汇')
     )
-    name = models.CharField(max_length=50)
-    barter_type = models.ForeignKey(BarterType, on_delete=models.CASCADE)
-    content = RichTextUploadingField()
+    name = models.CharField(max_length=50,verbose_name='换品名称')
+    barter_type = models.ForeignKey(BarterType,verbose_name='换品类型',on_delete=models.CASCADE)
+    content = RichTextUploadingField(verbose_name='换品描述')
     image = models.ImageField(upload_to='barter/%Y%m%d/', verbose_name='换品图片',blank=True, null=True)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE)
-    want_barter = models.CharField(max_length=500, blank=True, null=True)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE,verbose_name='卖家')
+    want_barter = models.CharField(max_length=500, blank=True, null=True,verbose_name='想换物品')
     read_details = GenericRelation(ReadDetail)
     created_time = models.DateTimeField(auto_now_add=True)
     last_updated_time = models.DateTimeField(auto_now=True)
     where = models.SmallIntegerField(default=0, choices=where_choices, verbose_name='所在校区')
     status = models.SmallIntegerField(default=1, choices=status_choices, verbose_name='状态')
+    isDelete = models.BooleanField(verbose_name='是否删除', default=False)
 
     # 保存时处理图片
     def save(self, *args, **kwargs):
@@ -58,7 +59,10 @@ class Barter(models.Model, ReadNumExpandMethod):
         return self.seller.email
 
     def get_url(self):
-        return reverse('bbs_detail', kwargs={'bbs_pk': self.pk})
+        return reverse('barter_detail', kwargs={'barter_pk': self.pk})
+
+    def get_user(self):
+        return self.seller
 
     def __str__(self):
         return "<Barter: %s>" % self.name

@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load notifications_tags %}
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'jquery-1.12.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'notifications/notify.js' %}"></script>
     {% block header_extends %}{% endblock %}
 </head>
 <body>
@@ -37,9 +39,22 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <form class="navbar-form search-form" action="{% url 'search' %}">
+                            <div class="form-group">
+                                <input type="text" name="wd" class="form-control" placeholder="Search">
+                            </div>
+                            <button type="submit" class="btn btn-default">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </form>
+                    </li>
                     {% if not user.is_authenticated %}
                         <li>
                             <a href="{% url 'add_bbs' %}?from={{ request.get_full_path }}">发帖</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'add_barter' %}?from={{ request.get_full_path }}">发布换品</a>
                         </li>
                         <li>
                             <a href="{% url 'login' %}?from={{ request.get_full_path }}">登录</a>
@@ -48,21 +63,26 @@
                             <a href="{% url 'register' %}?from={{ request.get_full_path }}">注册</a>
                         </li>
                     {% else %}
+                        <li><a href="{% url 'add_bbs' %}">发布帖子</a></li>
+                        <li><a href="{% url 'add_barter' %}">发布换品</a></li>
+                        {% notifications_unread as unread_count %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                                {% if user.has_nickname %}
-                                    {{ user.username }}({{ user.get_nickname }}) 
-                                {% else %}
-                                    {{ user.username }}
-                                {% endif %}
+                                你好，{% if user.has_nickname %}
+                                        {{ user.username }}({{ user.get_nickname }}) 
+                                    {% else %}
+                                        {{ user.username }}
+                                    {% endif %}
+                                <span class="badge unread-count live_notify_badge">{% if unread_count > 0 %}{{ unread_count }}{% endif %}</span>
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'user_info' %}">个人资料</a></li>
                                 <li><a href="{% url 'change_password' %}">修改密码</a></li>
-                                <li><a href="{% url 'add_bbs' %}">发布帖子</a></li>
-                                <li><a href="{% url 'add_barter' %}">发布换品</a></li>
-                                <li><a href="">站内信</a></li>
+                                <li><a href="{% url 'my_notifications' %}">站内信  <span class="badge unread-count live_notify_badge">{% if unread_count > 0 %}{{ unread_count }}{% endif %}</span></a></li>
+                                <li><a href="{% url 'personal_bbs' %}">我的帖子</a></li>
+                                <li><a href="{% url 'personal_barters' %}">我的换品</a></li>
+                                <li><a href="{% url 'my_application' %}">我的申请</a></li>
                                 {% if user.is_staff or user.is_superuser %}
                                     <li><a href="{% url 'admin:index' %}">后台管理</a></li>
                                 {% endif %}
@@ -76,6 +96,14 @@
     </div>
 
     {% block content %}{% endblock %}
+
+    <!-- footer -->
+    <div class="footer">
+        <div class="website-info">
+            <p>皖ICP备18006264号-3 Copyright©2021 shenwen.shnuer.club 版权所有</p>
+            <p>意见反馈或联系我（JackChangz@163.com）</p>
+        </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="login_modal" tabindex="-1" role="dialog">
@@ -121,8 +149,17 @@
                 }
             });
         });
-    </script>
 
+        //自定义实时获取未读消息
+        function my_special_notification_callback(data){
+            unread_count = data['unread_count'];
+            if(unread_count==0){
+                unread_count = '';
+            }
+            $('.live_notify_badge').text(unread_count)
+        }
+    </script>
+    {% register_notify_callbacks callbacks='my_special_notification_callback' %}
     {% block script_extends %}{% endblock %}
 </body>
 </html>

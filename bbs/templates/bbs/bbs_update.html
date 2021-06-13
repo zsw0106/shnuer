@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% load staticfiles %}
+{% load staticfiles %}
+{% block title %} 更新文章 {% endblock title %}
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'bbs/bbs.css' %}">
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <br>
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ form.as_ul }}
+                <input  type="submit" value="提交">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

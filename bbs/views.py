@@ -46,7 +46,7 @@ def get_bbs_list_common_data(request, bbss_all_list):
     return context
 
 def bbs_list(request):
-    bbss_all_list = BBS.objects.all()
+    bbss_all_list = BBS.objects.filter(is_delete=0)
     context = get_bbs_list_common_data(request, bbss_all_list)
     return render(request, 'bbs/bbs_list.html', context)
 
@@ -82,7 +82,44 @@ def add_bbs(request):
         if bbs_form.is_valid():
             bbs_form.instance.author = request.user #获取登录用户实例，创建帖子
             bbs_form.save()
-            return redirect(request.GET.get('from', reverse('home')))
+            return redirect(request.GET.get('from', reverse('bbs_list')))
     else:
         bbs_form = BBSForm()
     return render(request, 'bbs/add_bbs.html', {'bbs_form':bbs_form})
+
+# 删文章
+def bbs_delete(request, id):
+    # 根据 id 获取需要删除的文章
+    bbs = BBS.objects.get(id=id)
+    # 调用.delete()方法删除文章
+    print(bbs)
+    bbs.is_delete = 1
+    bbs.save()
+    # 完成删除后返回文章列表
+    return redirect("bbs_list")
+
+# 更新bbs
+def bbs_update(request, id):
+    bbs = BBS.objects.get(id = id)
+    if request.method != 'POST':
+        # 如果不是post,创建一个表单，并用instance=article当前数据填充表单
+        form = BBSForm(instance=bbs) 
+    else:
+  # 如果是post,instance=bbs当前数据填充表单，并用data=request.POST获取到表单里的内容
+        form = BBSForm(instance=bbs, data=request.POST)
+        form.save() # 保存
+        if form.is_valid(): # 验证
+            return redirect('bbs_detail',bbs.pk) # 成功跳转
+    return render(request, 'bbs/bbs_update.html', {'form':form,'bbs':bbs})
+
+# 个人帖子
+def personal_bbs(request):
+    bbss = BBS.objects.filter(author=request.user, is_delete=0)
+    paginator = Paginator(bbss, 8)
+    page_num = request.GET.get('page', 1) # 获取url的页面参数（GET请求）
+    page_of_bbss = paginator.get_page(page_num)
+    context = {}
+    context['page_of_bbss'] = page_of_bbss
+    context['bbss_count'] = bbss.count()
+    context['user'] = request.user 
+    return render(request, 'bbs/personal_bbs.html', context)

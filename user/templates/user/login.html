@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load user_tags %}
 
 {% block title %}Shnuer|登录{% endblock %}
 {% block nav_home_active %}active{% endblock %}
@@ -26,12 +28,13 @@
                             </form>
                         </div>
                     </div>  
+                    <a href="{% get_login_qq_url %}"><img src="{% static 'user/qq.png' %}"></a>
                 {% else %}
                     <span>已登录，跳转到首页...</span>
                     <script type="text/javascript">
                         window.location.href = '/';
                     </script>
-                {% endif %}              
+                {% endif %}             
             </div>
         </div>
     </div>    

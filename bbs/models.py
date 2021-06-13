@@ -12,16 +12,20 @@ class BBSType(models.Model):
         return self.type_name
 
 class BBS(models.Model, ReadNumExpandMethod):
-    title = models.CharField(max_length=50)
-    bbs_type = models.ForeignKey(BBSType, on_delete=models.CASCADE)
-    content = RichTextUploadingField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50,verbose_name='标题')
+    bbs_type = models.ForeignKey(BBSType, on_delete=models.CASCADE,verbose_name='帖子类型')
+    content = RichTextUploadingField(verbose_name='帖子内容')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
     read_details = GenericRelation(ReadDetail)
     created_time = models.DateTimeField(auto_now_add=True)
-    last_updated_time = models.DateTimeField(auto_now=True)    
+    last_updated_time = models.DateTimeField(auto_now=True)
+    is_delete = models.SmallIntegerField(default=0, verbose_name='帖子状态')
 
     def get_url(self):
         return reverse('bbs_detail', kwargs={'bbs_pk': self.pk})
+
+    def get_user(self):
+        return self.author
 
     def get_email(self):
         return self.author.email

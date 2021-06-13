@@ -15,66 +15,116 @@
 {% block content %}
     <h3 class="home-content">厚德 博学 求是 笃行</h3>
     <!-- 图表容器 DOM -->
-    <div id="container"></div>
-    <div class="hot-data">
-        <h3 class="glyphicon glyphicon-paperclip">今日热门帖子</h3>
+    <div id="container" style="min-width:400px;height:400px"></div>
+    <div align="center">
+        <div class="hot-data" style="width: 33%;float: left;">
+            <h3 class="glyphicon glyphicon-paperclip hot-title">今日热门帖子</h3>
+            <ul>
+                {% for hot_data in today_hot_data %}
+                    <li><a href="{% url 'bbs_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a> ({{ hot_data.read_num }})</li>            
+                {% empty %}
+                    <li>今日暂时没有热门帖子</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="hot-data" style="width: 33%;float: left;">
+            <h3 class="glyphicon glyphicon-paperclip hot-title">昨日热门帖子</h3>
+            <ul>
+                {% for hot_data in yesterday_hot_data %}
+                    <li><a href="{% url 'bbs_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a>({{ hot_data.read_num }})</li>            
+                {% empty %}
+                    <li>昨日没有热门帖子</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="hot-data" style="width: 33%;float: left;">
+            <h3 class="glyphicon glyphicon-paperclip hot-title">7日热门帖子</h3>
+            <ul>
+                {% for hot_bbs in hot_bbss_for_7_days %}
+                    <li><a href="{% url 'bbs_detail' hot_bbs.id %}">{{ hot_bbs.title }}</a>({{ hot_bbs.read_num_sum }})</li>            
+                {% empty %}
+                    <li>7日内没有热门帖子</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div>
+    <div class="hot-data" style="width: 33%;float: left;">
+        <h3 class="glyphicon glyphicon-paperclip hot-title">今日热门换品</h3>
         <ul>
-            {% for hot_data in today_hot_data %}
-                <li><a href="{% url 'bbs_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a>({{ hot_data.read_num }})</li>            
+            {% for hot_data in hptoday_hot_data %}
+                <li><a href="{% url 'barter_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.name }}</a>({{ hot_data.read_num }})</li>            
             {% empty %}
-                <li>今日暂时没有热门帖子</li>
+                <li>今日暂时没有热门换品</li>
             {% endfor %}
         </ul>
     </div>
-    <div class="hot-data">
-        <h3 class="glyphicon glyphicon-paperclip">昨日热门帖子</h3>
+    <div class="hot-data" style="width: 33%;float: left;">
+        <h3 class="glyphicon glyphicon-paperclip hot-title">昨日热门换品</h3>
         <ul>
-            {% for hot_data in yesterday_hot_data %}
-                <li><a href="{% url 'bbs_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a>({{ hot_data.read_num }})</li>            
+            {% for hot_data in hpyesterday_hot_data %}
+                <li><a href="{% url 'barter_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.name }}</a>({{ hot_data.read_num }})</li>            
             {% empty %}
-                <li>昨日没有热门帖子</li>
+                <li>昨日没有热门换品</li>
             {% endfor %}
         </ul>
     </div>
-    <div class="hot-data">
-        <h3 class="glyphicon glyphicon-paperclip">7日热门帖子</h3>
+    <div class="hot-data" style="width: 33%;float: left;">
+        <h3 class="glyphicon glyphicon-paperclip hot-title">7日热门换品</h3>
         <ul>
-            {% for hot_bbs in hot_bbss_for_7_days %}
-                <li><a href="{% url 'bbs_detail' hot_bbs.id %}">{{ hot_bbs.title }}</a>({{ hot_bbs.read_num_sum }})</li>            
+            {% for hot_barter in hot_barters_for_7_days %}
+                <li><a href="{% url 'barter_detail' hot_barter.id %}">{{ hot_barter.name }}</a>({{ hot_barter.read_num_sum }})</li>            
             {% empty %}
-                <li>7日内没有热门帖子</li>
+                <li>7日内没有热门换品</li>
             {% endfor %}
         </ul>
     </div>
+    </div>
+
     <script>
         // 图表配置
+
         var options = {
-            chart: { type: 'line' },
-            title: { text: null },
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: '站点浏览量'
+            },
+            subtitle: {
+                text: '数据来源: Shnuer.club'
+            },
             xAxis: {
                 categories: {{ dates|safe }},   // x 轴分类
                 tickmarkPlacement: 'on',
-                title: { text: '前7日阅读量变化'},
+                title: { text: '前7日浏览量量变化'},
             },
             yAxis: {
                 title: { text: null },
                 labels:{ enabled: false },
                 gridLineDashStyle: 'Dash',
             },
-            series: [{                              // 数据列
-                name: '阅读量',                     // 数据列名
-                data: {{ read_nums }}               // 数据
-            }],
+            credits: { enabled: false },
             plotOptions: {
                 line: {
                     dataLabels: {
-                        enabled: true
-                    }
+                        // 开启数据标签
+                        enabled: true          
+                    },
+                    // 关闭鼠标跟踪，对应的提示框、点击事件会失效
+                    enableMouseTracking: false
                 }
             },
-            legend: { enabled: false },
-            credits: { enabled: false },
+            series: [{
+                name: '帖子',
+                data: {{ read_nums }}
+            }, {
+                name: '换品',
+                data: {{ hpread_nums }}
+            }]
         };
+
+
         // 图表初始化函数
         var chart = Highcharts.chart('container', options);
     </script>

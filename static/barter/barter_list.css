@@ -116,3 +116,9 @@ div.like {
 div.like .active{
     color: #f22;
 }
+
+.h2-font{ 
+     color: transparent;
+     -webkit-text-stroke: 1px black;
+     letter-spacing: 0.04em;
+   }

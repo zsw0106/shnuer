@@ -14,12 +14,13 @@
 {% block content %}
 <div class="htmleaf-container">
         <div class="container">
+            <h2 align="center" class="h2-font">{% block barter_list_title %}换品列表{% endblock %}</h2>
             <div class="" id="my-gallery-container">
-                {% for barter in barters %}
+                {% for barter in page_of_barters %}
                     {% if barter.image %}
                     <div class="item"><a href="{% url 'barter_detail' barter.pk %}"><img src="{{ barter.image.url }}"  width=100% height=250px></a>
-                        <h2>换品：{{ barter.name }}</h2><br>
-                        <h2>想换物品：{{ barter.want_barter }}</h2><br>
+                        <h3  class="h2-font">换品：{{ barter.name }}</h3><br>
+                        <h3  class="h2-font">想换物品：{{ barter.want_barter }}</h3><br>
                         {{ barter.content|striptags|truncatechars:20|safe }}<br><br>
                         <a href="{% url 'barter_detail' barter.pk %}"><button class="btn btn-primary"  style="text-align:center; width:100%;height:100%;margin:0px; ">换品详情</button></a>
                         <br><br><br>
@@ -33,8 +34,8 @@
                     </div>
                     {% else %}
                     <div class="item"><a href=""><img src="{% static 'img/dummy.png' %}"  width=100% height=250px></a>
-                        <h2>换品：{{ barter.name }}</h2><br>
-                        <h2>想换物品：{{ barter.want_barter }}</h2><br>
+                        <h2  class="h2-font">换品：{{ barter.name }}</h2><br>
+                        <h2  class="h2-font">想换物品：{{ barter.want_barter }}</h2><br>
                         {{ barter.content|striptags|truncatechars:20|safe }}<br><br>
                         <button type="submit" class="btn btn-primary" style="text-align:center; width:100%;height:100%;margin:0px; ">换品详情</button>
                         <br><br><br>
@@ -47,7 +48,26 @@
                     </div>
                     {% endif %}
                 {% endfor %}
+                <div class="paginator">
+                    <ul class="pagination">
+                        <div class="row" style="display: flex; justify-content: center;">
+                        {% if page_of_barters.has_previous %}
+                            <a class="btn btn-default"
+                               href="{% url 'barter_list' %}?page={{ page_of_barters.previous_page_number }}">
+                                上一页
+                            </a>
+                        {% endif %}
+
+                        {% if page_of_barters.has_next %}
+                        <a class="btn btn-default"
+                           href="{% url 'barter_list' %}?page={{ page_of_barters.next_page_number }}">
+                            下一页
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
+            
         </div>
     </div>
 {% endblock content %}

@@ -20,7 +20,11 @@
                 <h3>{{ barter.name }}</h3><hr><br>
                 <ul class="barter-info-description">    
                     <li>分类：<a href="{% url 'barter_with_type' barter.barter_type.pk %}">{{ barter.barter_type }}</a></li>
-
+                    {% if barter.seller == request.user %}
+                        <li>状态：{{ barter.get_status_display }}</li>
+                        <a href="{% url 'barter_delete' barter.id %}">删除换品</a>
+                        <a href="{% url 'barter_update' barter.id %}">编辑换品</a>
+                    {% endif %}
                 </ul>
                 <div>
                     <div class="" style="padding: 2em;border-bottom-style: solid;border-width: 1px;"><img src="{{ barter.image.url }}"></div>
@@ -35,6 +39,7 @@
                         <span>喜欢</span>
                     </div>
                     <ul class="barter-info-description">
+                        <li><strong>想换物品:{{ barter.want_barter }}</strong></li>
                         <li>发布者：{{ barter.seller }}</li>
                         {% ifequal barter.where 0 %}
                             <li>所在校区：奉贤校区</li>
@@ -50,6 +55,32 @@
         </div>
         <div class="row">
             <div class="col-xs-10 col-xs-offset-1">
+                {% if request.user != barter.seller %}
+                    <div class="comment-area">
+                        <h3 class="comment-area-title">交换专区</h3>
+                        <div id="barter_list">
+                        {% if user.is_authenticated %}
+                            <form id="apply_form" action="{% url 'apply_barter' %}" method="POST" style="overflow:hidden">
+                                {% csrf_token %}
+                                我的库存：
+                                <select name="select_mybarters">
+                                    {% for mybarter in mybarters %}
+                                        <option value={{ mybarter.id }}>{{ mybarter.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                当前浏览：
+                                <select name="sell_barter"><option value={{ barter.pk }}>{{ barter.name }}</option></select>
+                            <input type="submit" value="请求交换" class="btn btn-primary pull-right">   
+                            </form>
+                        {% else %}
+                        您尚未登录，登录之后方可评论~ 
+                            <a class="btn btn-primary" href="{% url 'login' %}?from={{ request.get_full_path }}">登录</a>
+                            <span> or </span>
+                            <a class="btn btn-danger" href="{% url 'register' %}?from={{ request.get_full_path }}">注册</a>
+                        {% endif %}
+                        </div>            
+                    </div>
+                    {% endif %}
                 <div class="comment-area">
                     <h3 class="comment-area-title">提交评论</h3>
                     {% if user.is_authenticated %}
@@ -73,23 +104,6 @@
                         <span> or </span>
                         <a class="btn btn-danger" href="{% url 'register' %}?from={{ request.get_full_path }}">注册</a>
                     {% endif %}
-                </div>
-                <div class="comment-area">
-                    <h3 class="comment-area-title">交换专区</h3>
-                    <div id="comment_list">
-                    <form id="apply_form" action="{% url 'apply_barter' %}" method="POST" style="overflow:hidden">
-                        {% csrf_token %}
-                        我的库存：
-                        <select name="select_mybarters">
-                            {% for mybarter in mybarters %}
-                                <option value={{ mybarter.id }}>{{ mybarter.name }}</option>
-                            {% endfor %}
-                        </select>
-                        当前浏览：
-                        <select name="sell_barter"><option value={{ barter.pk }}>{{ barter.name }}</option></select>
-                    <input type="submit" value="请求交换" class="btn btn-primary pull-right">   
-                    </form>
-                    </div>            
                 </div>
                 <div class="comment-area">
                     <h3 class="comment-area-title">评论列表</h3>

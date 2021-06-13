@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}申请{% endblock %}
+{% block nav_barter_active %}active{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+{% block header_extends %}
+    <link rel="stylesheet" type="text/css" href="{% static 'barter/barter_list.css' %}">
+{% endblock %}
+
+<!-- 写入 base.html 中定义的 content -->
+{% block content %}
+<div class="htmleaf-container">
+        <div class="container">
+            <h2 align="center" style=" color: transparent;-webkit-text-stroke: 1px black;letter-spacing: 0.04em;">{% block barter_list_title %}收到的申请{% endblock %}</h2>
+            <div class="" id="my-gallery-container">
+                {% for myapplication in myapplications %}
+                        订单号:{{ myapplication.order_id }}
+                        我的换品:<a href="{% url 'barter_detail' myapplication.sell_barter.pk %}">{{ myapplication.sell_barter.name }}</a>
+                        买家:{{ myapplication.buyer }}
+                        Ta的换品:<a href="{% url 'barter_detail' myapplication.buy_barter.pk %}">{{ myapplication.buy_barter.name }}</a>
+                        订单状态:{{ myapplication.get_status_display }}
+                    {% if myapplication.status == 0 %}
+                        <input id="btn_recive" class="btn btn-primary" type="button" onclick="rec_click('{{ myapplication.order_id }}')" name="recive" value="同意">
+                        <input id="btn_reject" class="btn btn-primary" type="button" onclick="rej_click('{{ myapplication.order_id }}')" name="reject" value="拒绝">
+                        <br>
+                    {% else %}
+                        <br>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <h2 align="center" style=" color: transparent;-webkit-text-stroke: 1px black;letter-spacing: 0.04em;">我的申请</h2>
+                {% for myapply in my_applys %}
+                        订单号:{{ myapply.order_id }}
+                        我的换品:<a href="{% url 'barter_detail' myapply.sell_barter.pk %}">{{ myapply.sell_barter.name }}</a>
+                        买家:{{ myapply.buyer }}
+                        Ta的换品:<a href="{% url 'barter_detail' myapply.buy_barter.pk %}">{{ myapply.buy_barter.name }}</a>
+                        订单状态:{{ myapply.get_status_display }}
+                        <br>
+                {% endfor %}
+        </div>
+    </div>
+{% endblock content %}
+
+{% block script_extends %}
+<script type="text/javascript">
+     function rec_click(order_id){
+            var order_id = order_id;
+            $.ajaxSetup({
+　　　　data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+　　})
+            $.ajax({
+            url: "{% url 'recive_apply' %}",
+            type: "POST",
+            //data: $('#layui-form').serialize(),
+            data: {'data':order_id},
+            success: function (data) {
+                alert("已将您的邮箱账号发送给对方！");
+                window.location.reload();
+            },
+            error: function (data) {
+                console.info("出错啦");
+            }
+        });
+     }
+     function rej_click(order_id){
+            var order_id = order_id;
+            $.ajaxSetup({
+　　　　data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+　　})
+            $.ajax({
+            url: "{% url 'reject_apply' %}",
+            type: "POST",
+            //data: $('#layui-form').serialize(),
+            data: {'data':order_id},
+            success: function (data) {
+                alert("已拒绝该申请");
+                window.location.reload();
+            },
+            error: function (data) {
+                console.info("出错啦");
+            }
+        });
+     }
+</script>
+{% endblock %}
+    

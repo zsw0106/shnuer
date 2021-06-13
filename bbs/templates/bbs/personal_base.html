@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}帖子中心{% endblock %}
+{% block nav_bbs_active %}active{% endblock %}
+
+{% load staticfiles %}
+{% load comment_tags %}
+{% load likes_tags %}
+
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'bbs/bbs.css' %}">
+{% endblock %}
+
+{# 页面内容 #}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">{% block bbs_list_title %}帖子列表{% endblock %}</div>
+                    <div class="panel-body">
+                        {% for bbs in page_of_bbss %}
+                            <div class="bbs">
+                                <h3><a href="{% url 'bbs_detail' bbs.pk %}">{{ bbs.title }}</a></h3>
+                                <p class="bbs-info">
+                                    <span class="glyphicon glyphicon-tag"></span> <a href="{% url 'bbss_with_type' bbs.bbs_type.pk %}">{{ bbs.bbs_type }}</a>&nbsp;&nbsp;
+                                    <span class="glyphicon glyphicon-time"></span> {{ bbs.created_time|date:"Y-m-d" }}&nbsp;&nbsp;
+                                    阅读({{ bbs.get_read_num }})&nbsp;&nbsp;
+                                    评论({% get_comment_count bbs %})&nbsp;&nbsp;
+                                    点赞({% get_like_count bbs %})
+                                </p>
+                                <p>{{ bbs.content|striptags|truncatechars:120|safe}}</p>
+                            </div>
+                        {% empty %}
+                            <div class="bbs">
+                                <h3>暂无发帖，敬请期待</h3>
+                            </div>
+                        {% endfor %} 
+                    </div>
+                </div>
+                <div class="paginator">
+                    <ul class="pagination">
+                        <div class="row" style="display: flex; justify-content: center;">
+                        {% if page_of_bbss.has_previous %}
+                            <a class="btn btn-default"
+                               href="{% url 'personal_bbs' %}?page={{ page_of_bbss.previous_page_number }}">
+                                上一页
+                            </a>
+                        {% endif %}
+
+                        {% if page_of_bbss.has_next %}
+                        <a class="btn btn-default"
+                           href="{% url 'personal_bbs' %}?page={{ page_of_bbss.next_page_number }}">
+                            下一页
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

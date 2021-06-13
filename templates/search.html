@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    SHNUER|搜索
+{% endblock %}
+
+{% block header_extends %}
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                {% if search_words == '' %}
+                    <h3>你没有搜索任何内容。</h3>
+                    <p>你可以尝试输入点什么东西，例如：Django</p>
+                {% else %}
+                    搜索“{{ search_words }}”
+                    <h3>找到{{ search_bbss_count }}个帖子</h3>
+                    <hr>
+                    {% for bbs in page_of_bbss %}
+                        <a href="{% url 'bbs_detail' bbs.pk %}">
+                            <h4>{{ bbs.title }}</h4>
+                        </a>
+                        <p>{{ bbs.content | striptags | truncatechars_html:100}}</p>
+                    {% empty %}
+                        <p>没有找到任何帖子，换个关键词试试吧</p>
+                    {% endfor %}
+
+                    <div class="row" style="display: flex; justify-content: center;">
+                        {% if page_of_bbss.has_previous %}
+                            <a class="btn btn-default"
+                               href="{% url 'search' %}?wd={{ search_words }}&page={{ page_of_bbss.previous_page_number }}">
+                                上一页
+                            </a>
+                        {% endif %}
+
+                        {% if page_of_bbss.has_next %}
+                        <a class="btn btn-default"
+                           href="{% url 'search' %}?wd={{ search_words }}&page={{ page_of_bbss.next_page_number }}">
+                            下一页
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <h3>找到{{ search_barters_count }}个换品</h3>
+                    <hr>
+                    {% for barter in page_of_barters %}
+                        <a href="{% url 'barter_detail' barter.pk %}">
+                            <h4>{{ barter.name }}</h4>
+                        </a>
+                        <p>{{ barter.content | striptags | truncatechars_html:100}}</p>
+                        <a href="{% url 'barter_detail' barter.pk %}"><img src="{{ barter.image.url }}"  width=100px height=100px></a>
+                        <br>
+                    {% empty %}
+                        <p>没有找到任何换品，换个关键词试试吧</p>
+                    {% endfor %}
+
+                    <div class="row" style="display: flex; justify-content: center;">
+                        {% if page_of_barters.has_previous %}
+                            <a class="btn btn-default"
+                               href="{% url 'search' %}?wd={{ search_words }}&pagehp={{ page_of_barters.previous_page_number }}">
+                                上一页
+                            </a>
+                        {% endif %}
+
+                        {% if page_of_barters.has_next %}
+                        <a class="btn btn-default"
+                           href="{% url 'search' %}?wd={{ search_words }}&pagehp={{ page_of_barters.next_page_number }}">
+                            下一页
+                        </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

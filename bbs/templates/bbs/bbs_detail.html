@@ -20,6 +20,10 @@
                 <h3>{{ bbs.title }}</h3>
                 <ul class="bbs-info-description">
                     <li>作者：{{ bbs.author }}</li>
+                    {% if bbs.author == request.user %}
+                        <a href="{% url 'bbs_delete' bbs.id %}">删除文章</a>
+                        <a href="{% url 'bbs_update' bbs.id %}">编辑文章</a>
+                    {% endif %}
                     <li>分类：<a href="{% url 'bbss_with_type' bbs.bbs_type.pk %}">{{ bbs.bbs_type }}</a></li>
                     <li>发表日期：{{ bbs.created_time|date:"Y-m-d H:i:s" }}</li>
                     <li>阅读({{ bbs.get_read_num }})</li>
@@ -258,6 +262,10 @@
                     console.log(xhr)
                 }
             });
+        }
+        if (window.location.hash){
+            $('html').animate({scrollTop: $(window.location.hash).offset().top - 60
+            }, 500);
         }
     </script>
 {% endblock %}
